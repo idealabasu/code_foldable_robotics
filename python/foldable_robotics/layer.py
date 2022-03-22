@@ -126,7 +126,7 @@ def plot_poly(poly,color = None,edgecolor = None, facecolor =None, linewidth = .
         interiors = []
         for interior in poly.interiors:
             item = list(interior.coords)
-            if interior.is_ccw:
+            if not interior.is_ccw:
                 item=item[::-1]
             interiors.append(item)
         for item in [exterior]+interiors:

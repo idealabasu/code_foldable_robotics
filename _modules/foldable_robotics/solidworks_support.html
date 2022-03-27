@@ -1,18 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>foldable_robotics.solidworks_support &#8212; foldable_robotics  documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -44,12 +43,13 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shapely.geometry</span> <span class="k">as</span> <span class="nn">sg</span>
-<span class="kn">from</span> <span class="nn">foldable_robotics.layer</span> <span class="k">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">foldable_robotics.layer</span> <span class="kn">import</span> <span class="n">Layer</span>
 <span class="kn">import</span> <span class="nn">foldable_robotics.layer</span>
+<span class="kn">import</span> <span class="nn">foldable_robotics.dxf</span>
 
 <div class="viewcode-block" id="obj"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.obj">[docs]</a><span class="k">class</span> <span class="nc">obj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">pass</span></div>
-
+    
 <div class="viewcode-block" id="objectify"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.objectify">[docs]</a><span class="k">def</span> <span class="nf">objectify</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
         <span class="n">new_var</span> <span class="o">=</span> <span class="n">obj</span><span class="p">()</span>
@@ -68,10 +68,10 @@
 <div class="viewcode-block" id="Face"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.Face">[docs]</a><span class="k">class</span> <span class="nc">Face</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="create_loops"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.create_loops">[docs]</a><span class="k">def</span> <span class="nf">create_loops</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="create_loops"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.create_loops">[docs]</a><span class="k">def</span> <span class="nf">create_loops</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">prescale</span><span class="p">):</span>
 <span class="c1">#    plt.figure()</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">data1</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">objectify</span><span class="p">(</span><span class="n">data1</span><span class="p">)</span>
     <span class="n">global_transform</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
     <span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
@@ -87,6 +87,7 @@
                 <span class="n">loop</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
                 <span class="n">loop_a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">loop</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">loop</span><span class="p">),</span><span class="mi">1</span><span class="p">))])</span>
                 <span class="n">loop_t</span> <span class="o">=</span> <span class="n">loop_a</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+                <span class="n">loop_t</span><span class="o">*=</span><span class="n">prescale</span>
                 <span class="n">loop_out</span> <span class="o">=</span> <span class="n">loop_t</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
                 <span class="n">loops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loop_out</span><span class="p">)</span>
 <span class="c1">#                plt.fill(loop_t[:,0],loop_t[:,1])</span>
@@ -113,99 +114,118 @@
             <span class="n">component_new</span><span class="o">|=</span><span class="n">item</span>
         <span class="k">return</span> <span class="n">component_new</span></div>
             
-<div class="viewcode-block" id="get_joints"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.get_joints">[docs]</a><span class="k">def</span> <span class="nf">get_joints</span><span class="p">(</span><span class="o">*</span><span class="n">component_layers</span><span class="p">,</span><span class="n">round_digits</span><span class="p">):</span>
+<div class="viewcode-block" id="get_joints"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.get_joints">[docs]</a><span class="k">def</span> <span class="nf">get_joints</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span><span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
     <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">component_layers</span><span class="p">:</span>
-        <span class="n">segments</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">get_segments</span><span class="p">())</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
     
-    <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">]</span>
-    <span class="n">segment_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span>
-    <span class="n">segment_array</span> <span class="o">=</span> <span class="n">segment_array</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">round_digits</span><span class="p">)</span>
-    <span class="n">segments2</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="nb">tuple</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="ow">in</span> <span class="n">segment_array</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>    
-    <span class="n">segments3</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">segments2</span><span class="p">))</span>
     
-    <span class="n">ii</span> <span class="o">=</span> <span class="p">[</span><span class="n">segments3</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">segments2</span><span class="p">]</span>
-    <span class="n">jj</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ii</span><span class="p">))</span>
-    <span class="n">kk</span> <span class="o">=</span> <span class="p">[</span><span class="n">ii</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">jj</span><span class="p">]</span>
-    <span class="n">ll</span> <span class="o">=</span> <span class="p">[</span><span class="n">segments3</span><span class="p">[</span><span class="n">aa</span><span class="p">]</span> <span class="k">for</span> <span class="n">aa</span><span class="p">,</span><span class="n">bb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)</span> <span class="k">if</span> <span class="n">bb</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="n">mm</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ll</span><span class="p">:</span>
-        <span class="n">mm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segments2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
-        
-    <span class="n">nn</span> <span class="o">=</span> <span class="p">[</span><span class="n">segments</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">mm</span><span class="p">]</span>
     
-    <span class="k">return</span> <span class="n">nn</span></div>
+    <span class="k">for</span> <span class="n">ll</span><span class="p">,</span><span class="n">layer1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">layers</span><span class="p">):</span>
+        <span class="n">segments_a</span> <span class="o">=</span> <span class="n">layer1</span><span class="o">.</span><span class="n">get_segments</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">mm</span><span class="p">,</span><span class="n">layer2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="n">ll</span><span class="o">+</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">segments_b</span> <span class="o">=</span> <span class="n">layer2</span><span class="o">.</span><span class="n">get_segments</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">sega</span> <span class="ow">in</span> <span class="n">segments_a</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">segb</span> <span class="ow">in</span> <span class="n">segments_b</span><span class="p">:</span>
+                    <span class="n">ni1</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">slope_intercept</span><span class="p">(</span><span class="o">*</span><span class="n">sega</span><span class="p">)</span>
+                    <span class="n">ni2</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">slope_intercept</span><span class="p">(</span><span class="o">*</span><span class="n">segb</span><span class="p">)</span>
+                    <span class="n">e1</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni2</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                    <span class="n">e2</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni2</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span><span class="n">e2</span><span class="p">)</span>
+                    
+                    <span class="n">e3</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="n">e4</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ni2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="n">error</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="n">e3</span><span class="p">,</span><span class="n">e4</span><span class="p">)</span>
+            
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">error</span><span class="o">&lt;</span><span class="n">tolerance</span><span class="p">:</span>
+            
+                        <span class="n">interiors</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">colinear_segment_interior_points</span><span class="p">(</span><span class="n">sega</span><span class="p">,</span><span class="n">segb</span><span class="p">,</span><span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">)</span>
+                        <span class="c1"># print(interiors)</span>
+                        
+                        <span class="k">if</span> <span class="ow">not</span> <span class="ow">not</span> <span class="n">interiors</span><span class="p">:</span>
+                            <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interiors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">segments</span></div>
 
 <div class="viewcode-block" id="length"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.length">[docs]</a><span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="n">segment</span><span class="p">):</span>
     <span class="n">segment</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">segment</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">segment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">l</span><span class="o">=</span><span class="p">((</span><span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">**.</span><span class="mi">5</span>
+    <span class="n">l</span><span class="o">=</span><span class="p">((</span><span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">**</span><span class="mf">.5</span>
     <span class="k">return</span> <span class="n">l</span></div>
-                
-<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">user_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
-    <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_path</span><span class="p">,</span><span class="s1">&#39;class_foldable_robotics/cad/spherical_example&#39;</span><span class="p">)</span>
-    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="s1">&#39;input.yaml&#39;</span><span class="p">))</span>
-    <span class="n">components</span> <span class="o">=</span> <span class="n">create_loops</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">component_to_layer</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">components</span><span class="p">]</span>
-    <span class="n">layer2</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
-        <span class="n">layer2</span> <span class="o">|=</span> <span class="n">item</span><span class="o">&gt;&gt;</span><span class="mf">1e-3</span>
-    <span class="n">layer2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1">#    </span>
-    <span class="n">round_digits</span> <span class="o">=</span> <span class="mi">2</span>
-    
-    <span class="n">segments</span> <span class="o">=</span> <span class="n">get_joints</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span><span class="n">round_digits</span><span class="o">=</span><span class="n">round_digits</span><span class="p">)</span>
-    <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">length</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">]</span>
-    <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-    <span class="n">valid_segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span><span class="n">lengths</span><span class="p">)</span> <span class="k">if</span> <span class="n">l</span><span class="o">&gt;</span><span class="n">max_length</span><span class="o">/</span><span class="mi">1000</span><span class="p">]</span>
-    
-    <span class="n">linestrings</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">LineString</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">valid_segments</span><span class="p">]</span>
-    <span class="n">joints</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="o">*</span><span class="n">linestrings</span><span class="p">)</span>
-    <span class="n">joints</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<span class="c1">#    for segment in segments:</span>
-<span class="c1">#        segment = numpy.array(segment)</span>
-<span class="c1">#        plt.plot(segment[:,0],segment[:,1])</span>
 
-<span class="c1">#    layer2.export_dxf(&#39;bodies&#39;)</span>
-<span class="c1">#    joints.export_dxf(&#39;joints&#39;)</span>
-    
-    
+<span class="c1"># def filter_segments(segments,round_digits):</span>
+<span class="c1">#     lengths = [length(item) for item in segments]</span>
+<span class="c1">#     segments = [item for item,l in zip(segments,lengths) if l&gt;(10**(-round_digits))]</span>
+<span class="c1">#     return segments</span>
+
+<div class="viewcode-block" id="create_layered_dxf"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.create_layered_dxf">[docs]</a><span class="k">def</span> <span class="nf">create_layered_dxf</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">ezdxf</span>
     <span class="n">dwg</span> <span class="o">=</span> <span class="n">ezdxf</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;R2010&#39;</span><span class="p">)</span>
     <span class="n">msp</span> <span class="o">=</span> <span class="n">dwg</span><span class="o">.</span><span class="n">modelspace</span><span class="p">()</span>
 
     <span class="kn">import</span> <span class="nn">foldable_robotics.dxf</span>
 
-    <span class="n">dxf_layer_body</span> <span class="o">=</span> <span class="n">dwg</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="n">dxfattribs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">dxf</span><span class="o">.</span><span class="n">to_index</span><span class="p">[</span><span class="mh">0xff0000</span><span class="p">]})</span>    
-    <span class="n">dxf_layer_joints</span><span class="o">=</span> <span class="n">dwg</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;joints&#39;</span><span class="p">,</span> <span class="n">dxfattribs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">dxf</span><span class="o">.</span><span class="n">to_index</span><span class="p">[</span><span class="mh">0x0000ff</span><span class="p">]})</span>    
+    <span class="k">for</span> <span class="n">info</span><span class="p">,</span><span class="n">items</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+<span class="c1">#        items = element.pop(&#39;items&#39;)</span>
+        
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">dwg</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="o">.</span><span class="n">get_paths</span><span class="p">():</span>
+            <span class="n">msp</span><span class="o">.</span><span class="n">add_lwpolyline</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="n">dxfattribs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;layer&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]})</span>
+        
+    <span class="n">dwg</span><span class="o">.</span><span class="n">saveas</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>     </div>
 
-    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">layer2</span><span class="o">.</span><span class="n">get_paths</span><span class="p">():</span>
-        <span class="n">msp</span><span class="o">.</span><span class="n">add_lwpolyline</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">dxfattribs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;layer&#39;</span><span class="p">:</span> <span class="s1">&#39;body&#39;</span><span class="p">})</span>
-    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">joints</span><span class="o">.</span><span class="n">get_paths</span><span class="p">():</span>
-        <span class="n">msp</span><span class="o">.</span><span class="n">add_lwpolyline</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">dxfattribs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;layer&#39;</span><span class="p">:</span> <span class="s1">&#39;joints&#39;</span><span class="p">})</span>
+<div class="viewcode-block" id="process"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.solidworks_support.process">[docs]</a><span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">input_filename</span><span class="p">,</span><span class="n">output_file_name</span><span class="p">,</span><span class="n">prescale</span><span class="p">,</span><span class="n">round_digits</span><span class="p">,</span><span class="n">body_prebuffer</span><span class="o">=-</span><span class="mf">.001</span><span class="p">,</span><span class="n">joint_tolerance</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
 
-    <span class="n">full_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_path</span><span class="p">,</span><span class="s1">&#39;desktop&#39;</span><span class="p">,</span><span class="s1">&#39;design.dxf&#39;</span><span class="p">)</span>
-    <span class="n">dwg</span><span class="o">.</span><span class="n">saveas</span><span class="p">(</span><span class="n">full_output</span><span class="p">)</span>            
+    <span class="n">components</span> <span class="o">=</span> <span class="n">create_loops</span><span class="p">(</span><span class="n">input_filename</span><span class="p">,</span><span class="n">prescale</span><span class="p">)</span>
+    <span class="n">layers_orig</span> <span class="o">=</span> <span class="p">[</span><span class="n">component_to_layer</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">components</span><span class="p">]</span>
     
-<span class="c1">#    msp.add_line((0, 0), (10, 0), dxfattribs={&#39;layer&#39;: &#39;Lines&#39;})</span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">##        loops = self.exteriors()+self.interiors()</span>
-<span class="c1">#        for geom in self.geoms:</span>
-<span class="c1">#            if isinstance(geom,sg.Polygon):</span>
-<span class="c1">#                exterior = list(geom.exterior.coords)</span>
-<span class="c1">#                interiors = [list(interior.coords) for interior in geom.interiors]</span>
-<span class="c1">#                loops = [exterior]+interiors</span>
-<span class="c1">#</span>
-<span class="c1">#            elif isinstance(geom,sg.LineString):</span>
-<span class="c1">#                line = list(geom.coords)</span>
-<span class="c1">#                loops = [line]</span>
-<span class="c1">#            </span>
-<span class="c1">#            for loop in loops:</span>
-<span class="c1">#                msp.add_lwpolyline(loop)</span>
-<span class="c1">#        dwg.saveas(name+&#39;.dxf&#39;)    </span>
+    <span class="n">body_layers</span><span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">body_prebuffer</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">layers_orig</span><span class="p">]</span>
+    <span class="n">body_layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">()</span>
+    <span class="n">body_layer</span> <span class="o">=</span> <span class="n">body_layer</span><span class="o">.</span><span class="n">unary_union</span><span class="p">(</span><span class="o">*</span><span class="n">body_layers</span><span class="p">)</span>
+    
+    <span class="n">body_layer</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="n">segments</span> <span class="o">=</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">solidworks_support</span><span class="o">.</span><span class="n">get_joints</span><span class="p">(</span><span class="o">*</span><span class="n">layers_orig</span><span class="p">,</span><span class="n">tolerance</span><span class="o">=</span><span class="n">joint_tolerance</span><span class="p">)</span>
+    
+    <span class="n">linestrings</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">LineString</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">]</span>
+    <span class="n">joints</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="o">*</span><span class="n">linestrings</span><span class="p">)</span>
+    <span class="n">joints</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+    
+    <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;body&#39;</span><span class="p">,</span><span class="s1">&#39;dxfattribs&#39;</span><span class="p">:{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">dxf</span><span class="o">.</span><span class="n">to_index</span><span class="p">[</span><span class="mh">0xff0000</span><span class="p">]}},</span><span class="n">body_layer</span><span class="p">))</span>
+    <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="s1">&#39;joints&#39;</span><span class="p">,</span><span class="s1">&#39;dxfattribs&#39;</span><span class="p">:{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">dxf</span><span class="o">.</span><span class="n">to_index</span><span class="p">[</span><span class="mh">0x0000ff</span><span class="p">]}},</span><span class="n">joints</span><span class="p">))</span>
+    
+    <span class="n">foldable_robotics</span><span class="o">.</span><span class="n">solidworks_support</span><span class="o">.</span><span class="n">create_layered_dxf</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span><span class="n">output_file_name</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">body_layer</span><span class="p">,</span><span class="n">joints</span><span class="p">,</span><span class="n">components</span></div>
+       
+    
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">user_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span>
+    <span class="c1"># folder = os.path.join(user_path,&#39;C:/Users/danaukes/projects/papers_2019_foldable_textbook/_cad/spherical_example&#39;)</span>
+
+    <span class="c1"># folder=r&#39;C:\Users\danaukes\Dropbox (Personal)\projects\2020-12-06 Knife holder&#39;</span>
+    <span class="c1"># filename=&#39;knife_holder - Sheet1_Drawing View1.yaml&#39;</span>
+
+    <span class="c1"># folder = r&#39;C:\Users\danaukes\Dropbox (Personal)\projects\2019-12-27 silverware&#39;</span>
+    <span class="c1"># filename = &#39;re-assembled - Sheet1_Drawing View1.yaml&#39;</span>
+
+    <span class="n">folder</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\Users\danaukes\Desktop\test1&#39;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;fivebar - Sheet1_Drawing View1.yaml&#39;</span>
+
+    <span class="n">filename_simple</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="n">filename</span><span class="p">))</span>
+    
+    <span class="c1"># output_file_name = os.path.join(user_path,&#39;desktop&#39;,&#39;design.dxf&#39;)</span>
+    <span class="n">output_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span><span class="n">filename_simple</span><span class="o">+</span><span class="s1">&#39;.dxf&#39;</span><span class="p">)</span>
+    
+    
+    <span class="n">round_digits</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">full_path</span><span class="p">,</span><span class="n">output_file_name</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">round_digits</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+        <span class="n">component_to_layer</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+    <span class="n">a</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -224,7 +244,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../foldable_robotics/modules.html"> </a></li>
 </ul>
@@ -239,17 +259,23 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
@@ -258,8 +284,8 @@
       &copy;2017, Dan Aukes.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
 

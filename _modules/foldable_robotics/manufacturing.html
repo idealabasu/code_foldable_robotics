@@ -1,18 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>foldable_robotics.manufacturing &#8212; foldable_robotics  documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -42,8 +41,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">foldable_robotics</span>
-<span class="kn">from</span> <span class="nn">foldable_robotics.laminate</span> <span class="k">import</span> <span class="n">Laminate</span>
-<span class="kn">from</span> <span class="nn">foldable_robotics.layer</span> <span class="k">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">foldable_robotics.laminate</span> <span class="kn">import</span> <span class="n">Laminate</span>
+<span class="kn">from</span> <span class="nn">foldable_robotics.layer</span> <span class="kn">import</span> <span class="n">Layer</span>
 <span class="kn">import</span> <span class="nn">shapely.geometry</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="kn">import</span> <span class="nn">shapely.ops</span> <span class="k">as</span> <span class="nn">so</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -173,6 +172,35 @@
     <span class="n">new_lam</span>  <span class="o">=</span> <span class="n">Laminate</span><span class="p">(</span><span class="o">*</span><span class="n">result</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">new_lam</span> </div>
 
+<div class="viewcode-block" id="calc_projection_up"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.calc_projection_up">[docs]</a><span class="k">def</span> <span class="nf">calc_projection_up</span><span class="p">(</span><span class="n">laminate</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;find the projection of the laminate up&#39;&#39;&#39;</span>
+    <span class="n">layer1</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">()</span>
+    <span class="n">laminate1</span> <span class="o">=</span> <span class="n">Laminate</span><span class="p">(</span><span class="o">*</span><span class="p">([</span><span class="n">Layer</span><span class="p">()]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">laminate</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span><span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">laminate</span><span class="p">):</span>
+        <span class="n">layer1</span><span class="o">|=</span><span class="n">layer</span>
+        <span class="n">laminate1</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer1</span>
+    <span class="k">return</span> <span class="n">laminate1</span></div>
+
+<div class="viewcode-block" id="calc_projection_down"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.calc_projection_down">[docs]</a><span class="k">def</span> <span class="nf">calc_projection_down</span><span class="p">(</span><span class="n">laminate</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;find the projection of the laminate up&#39;&#39;&#39;</span>
+    <span class="n">pu</span> <span class="o">=</span> <span class="n">calc_projection_up</span><span class="p">(</span><span class="n">laminate</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">pd</span> <span class="o">=</span> <span class="n">pu</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span></div>
+
+<div class="viewcode-block" id="modify_keepout"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.modify_keepout">[docs]</a><span class="k">def</span> <span class="nf">modify_keepout</span><span class="p">(</span><span class="n">laminate</span><span class="p">,</span><span class="n">is_adhesive</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;is this better than other algorithms&#39;&#39;&#39;</span>
+    <span class="c1">#TODO:determine if this is the same as modify_up</span>
+    
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,(</span><span class="n">test</span><span class="p">,</span><span class="n">layer</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">laminate</span><span class="p">,</span><span class="n">is_adhesive</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">laminate</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ii</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">l</span> <span class="o">|=</span> <span class="n">laminate</span><span class="p">[</span><span class="n">ii</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ii</span><span class="o">&lt;</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">laminate</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">l</span> <span class="o">|=</span> <span class="n">laminate</span><span class="p">[</span><span class="n">ii</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">laminate</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">=</span><span class="n">l</span>
+    <span class="k">return</span> <span class="n">laminate</span></div>
+
 <div class="viewcode-block" id="not_removable_up"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.not_removable_up">[docs]</a><span class="k">def</span> <span class="nf">not_removable_up</span><span class="p">(</span><span class="n">laminate</span><span class="p">,</span><span class="n">is_adhesive</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This function computes the non-removable material in the up direction for a given laminate.  </span>
 <span class="sd">    </span>
@@ -188,6 +216,7 @@
         <span class="n">result</span><span class="o">|=</span><span class="n">layer</span>
         <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
     <span class="n">new_lam</span> <span class="o">=</span> <span class="n">Laminate</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">)</span>
+    <span class="c1">#TODO: does is_adhesive need to be flipped?</span>
     <span class="n">new_lam</span> <span class="o">=</span> <span class="n">modify_up</span><span class="p">(</span><span class="n">new_lam</span><span class="p">,</span><span class="n">is_adhesive</span><span class="p">)</span>    
     <span class="n">new_lam</span> <span class="o">=</span> <span class="n">new_lam</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
@@ -237,7 +266,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span></div>
         
-<div class="viewcode-block" id="support"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.support">[docs]</a><span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="n">laminate</span><span class="p">,</span><span class="n">keepout_method</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">invalid_width</span><span class="p">,</span> <span class="n">small_dim</span> <span class="o">=</span> <span class="o">.</span><span class="mi">001</span><span class="p">):</span>
+<div class="viewcode-block" id="support"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.support">[docs]</a><span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="n">laminate</span><span class="p">,</span><span class="n">keepout_method</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">invalid_width</span><span class="p">,</span> <span class="n">small_dim</span> <span class="o">=</span> <span class="mf">.001</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;This function computes support for a laminate.  </span>
 <span class="sd">    </span>
 <span class="sd">   :param laminate: input shape</span>
@@ -374,7 +403,101 @@
     <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">rotate</span><span class="p">((</span><span class="n">post_rotate</span><span class="p">)</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
     <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">*</span><span class="n">p3</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">laminate</span>    </div>
+
+<div class="viewcode-block" id="map_line_scale"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.map_line_scale">[docs]</a><span class="k">def</span> <span class="nf">map_line_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">p3</span><span class="p">,</span><span class="n">p4</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Transforms a layer or laminate by using the translation and rotation between two lines to compute the stretch, scale, and rotation. </span>
+<span class="sd">    </span>
+<span class="sd">    :param self: input shape</span>
+<span class="sd">    :type self: Layer or Laminate</span>
+<span class="sd">    :param p1: point 1 of line 1 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param p1: point 2 of line 1 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param p1: point 1 of line 2 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param p1: point 2 of line 2 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param kwargs: unused</span>
+<span class="sd">    :type kwargs: dict</span>
+<span class="sd">    :rtype: Layer or Laminate</span>
+<span class="sd">    &#39;&#39;&#39;</span>   
+
+    <span class="kn">import</span> <span class="nn">math</span>
+    <span class="kn">import</span> <span class="nn">numpy</span>
+    <span class="kn">import</span> <span class="nn">foldable_robotics.geometry</span> <span class="k">as</span> <span class="nn">geometry</span>
     
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+    <span class="n">p3</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
+    <span class="n">p4</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p4</span><span class="p">)</span>
+
+    <span class="n">x_axis</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">p2</span><span class="o">-</span><span class="n">p1</span>
+<span class="c1">#    pre_rotate = geometry.angle(x_axis,p2-p1)</span>
+    <span class="n">pre_rotate</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">*</span><span class="n">v1</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">p4</span><span class="o">-</span><span class="n">p3</span>
+    <span class="n">post_rotate</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">total_angle</span><span class="p">(</span><span class="n">x_axis</span><span class="p">,</span><span class="n">p4</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span>
+    <span class="n">post_rotate</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">*</span><span class="n">v2</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">p4</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span><span class="o">/</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p1</span><span class="p">)</span>
+
+    <span class="n">laminate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">p1</span><span class="p">))</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">pre_rotate</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">affine_transform</span><span class="p">([</span><span class="n">scale</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">scale</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">rotate</span><span class="p">((</span><span class="n">post_rotate</span><span class="p">)</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">*</span><span class="n">p3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">laminate</span>    </div>
+
+<div class="viewcode-block" id="map_line_place"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.map_line_place">[docs]</a><span class="k">def</span> <span class="nf">map_line_place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">p3</span><span class="p">,</span><span class="n">p4</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Transforms a layer or laminate by using the translation and rotation between two lines to compute the stretch, scale, and rotation. </span>
+<span class="sd">    </span>
+<span class="sd">    :param self: input shape</span>
+<span class="sd">    :type self: Layer or Laminate</span>
+<span class="sd">    :param p1: point 1 of line 1 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param p1: point 2 of line 1 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param p1: point 1 of line 2 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param p1: point 2 of line 2 in (x,y) format</span>
+<span class="sd">    :type p1: tuple</span>
+<span class="sd">    :param kwargs: unused</span>
+<span class="sd">    :type kwargs: dict</span>
+<span class="sd">    :rtype: Layer or Laminate</span>
+<span class="sd">    &#39;&#39;&#39;</span>   
+
+    <span class="kn">import</span> <span class="nn">math</span>
+    <span class="kn">import</span> <span class="nn">numpy</span>
+    <span class="kn">import</span> <span class="nn">foldable_robotics.geometry</span> <span class="k">as</span> <span class="nn">geometry</span>
+    
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+    <span class="n">p3</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
+    <span class="n">p4</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p4</span><span class="p">)</span>
+
+    <span class="n">x_axis</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">p2</span><span class="o">-</span><span class="n">p1</span>
+<span class="c1">#    pre_rotate = geometry.angle(x_axis,p2-p1)</span>
+    <span class="n">pre_rotate</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">*</span><span class="n">v1</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">p4</span><span class="o">-</span><span class="n">p3</span>
+    <span class="n">post_rotate</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">total_angle</span><span class="p">(</span><span class="n">x_axis</span><span class="p">,</span><span class="n">p4</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span>
+    <span class="n">post_rotate</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">*</span><span class="n">v2</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># scale = geometry.length(p4-p3)/geometry.length(p2-p1)</span>
+
+    <span class="n">laminate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">p1</span><span class="p">))</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">pre_rotate</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">affine_transform</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">rotate</span><span class="p">((</span><span class="n">post_rotate</span><span class="p">)</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">origin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">laminate</span> <span class="o">=</span> <span class="n">laminate</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">*</span><span class="n">p3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">laminate</span>    </div>
+
 <div class="viewcode-block" id="modify_device"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.manufacturing.modify_device">[docs]</a><span class="k">def</span> <span class="nf">modify_device</span><span class="p">(</span><span class="n">device</span><span class="p">,</span><span class="n">custom_support_line</span><span class="p">,</span><span class="n">support_width</span><span class="p">,</span><span class="n">support_gap</span><span class="p">,</span><span class="n">hole_buffer</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    From a list of two-coordinate tuples, creates shapely lines.</span>
@@ -473,7 +596,7 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../foldable_robotics/modules.html"> </a></li>
 </ul>
@@ -488,17 +611,23 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
@@ -507,8 +636,8 @@
       &copy;2017, Dan Aukes.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>
 

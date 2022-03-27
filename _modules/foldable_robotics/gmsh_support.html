@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>foldable_robotics.gmsh_support &#8212; foldable_robotics  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for foldable_robotics.gmsh_support</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Feb 14 15:03:43 2019</span>
+
+<span class="sd">@author: danaukes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">numpy</span>        
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">shapely</span>
+<span class="kn">import</span> <span class="nn">shapely.geometry</span> <span class="k">as</span> <span class="nn">sg</span>
+<span class="kn">from</span> <span class="nn">foldable_robotics.layer</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">foldable_robotics.laminate</span> <span class="kn">import</span> <span class="n">Laminate</span>
+<span class="kn">import</span> <span class="nn">meshio</span>
+<span class="kn">import</span> <span class="nn">idealab_tools.plot_tris</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="GmshObject"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.GmshObject">[docs]</a><span class="k">class</span> <span class="nc">GmshObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">ii</span> <span class="o">=</span> <span class="mi">0</span>
+    
+<div class="viewcode-block" id="GmshObject.assign_id"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.GmshObject.assign_id">[docs]</a>    <span class="k">def</span> <span class="nf">assign_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
+        <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">ii</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">ii</span></div>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Point"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Point">[docs]</a><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="n">GmshObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_id</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="Point.comp"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Point.comp">[docs]</a>    <span class="k">def</span> <span class="nf">comp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span></div>
+
+<div class="viewcode-block" id="Point.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Point.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">my_string</span> <span class="o">=</span> <span class="s1">&#39;//+</span><span class="se">\n</span><span class="s1">Point(</span><span class="si">{0:d}</span><span class="s1">) = </span><span class="si">{5}{1:.3f}</span><span class="s1">,</span><span class="si">{2:.3f}</span><span class="s1">,</span><span class="si">{3:.3f}</span><span class="s1">,</span><span class="si">{4:.3f}{6}</span><span class="s1">;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span><span class="s1">&#39;{&#39;</span><span class="p">,</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_string</span></div></div>
+
+<div class="viewcode-block" id="Line"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Line">[docs]</a><span class="k">class</span> <span class="nc">Line</span><span class="p">(</span><span class="n">GmshObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">p2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_id</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Line.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Line.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">my_string</span> <span class="o">=</span> <span class="s1">&#39;//+</span><span class="se">\n</span><span class="s1">Line(</span><span class="si">{0:d}</span><span class="s1">) = {{</span><span class="si">{1:d}</span><span class="s1">,</span><span class="si">{2:d}</span><span class="s1">}};</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_string</span></div></div>
+
+<div class="viewcode-block" id="Loop"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Loop">[docs]</a><span class="k">class</span> <span class="nc">Loop</span><span class="p">(</span><span class="n">GmshObject</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">lines</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_id</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="Loop.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Loop.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">{0:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">my_string</span> <span class="o">=</span> <span class="s1">&#39;//+</span><span class="se">\n</span><span class="s1">Line Loop(</span><span class="si">{0:d}</span><span class="s1">) = {{</span><span class="si">{1}</span><span class="s1">}};</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_string</span></div></div>
+
+<div class="viewcode-block" id="Surface"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Surface">[docs]</a><span class="k">class</span> <span class="nc">Surface</span><span class="p">(</span><span class="n">GmshObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_id</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Surface.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Surface.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">my_string</span> <span class="o">=</span> <span class="s1">&#39;//+</span><span class="se">\n</span><span class="s1">Plane Surface(</span><span class="si">{0:d}</span><span class="s1">) = &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;{&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;};</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">my_string</span></div></div>
+
+<div class="viewcode-block" id="Extrude"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Extrude">[docs]</a><span class="k">class</span> <span class="nc">Extrude</span><span class="p">(</span><span class="n">GmshObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">surface</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surface</span> <span class="o">=</span> <span class="n">surface</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_id</span><span class="p">()</span>
+<div class="viewcode-block" id="Extrude.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Extrude.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">my_string</span> <span class="o">=</span> <span class="s1">&#39;//+</span><span class="se">\n</span><span class="s1">Extrude {&#39;</span><span class="o">+</span><span class="s1">&#39;0,0,</span><span class="si">{0:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;} {</span><span class="se">\n</span><span class="s1">  Surface{&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;};</span><span class="se">\n</span><span class="s1">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">my_string</span></div>
+<div class="viewcode-block" id="Extrude.extruded_points"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Extrude.extruded_points">[docs]</a>    <span class="k">def</span> <span class="nf">extruded_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tuples</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">comp</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">lines</span><span class="p">]</span>
+        <span class="n">tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="n">tuples</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">tuples</span></div></div>
+
+<div class="viewcode-block" id="Coherence"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Coherence">[docs]</a><span class="k">class</span> <span class="nc">Coherence</span><span class="p">(</span><span class="n">GmshObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">l1_volumes</span><span class="p">,</span><span class="n">l2_volumes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l1_volumes</span> <span class="o">=</span> <span class="n">l1_volumes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l2_volumes</span> <span class="o">=</span> <span class="n">l2_volumes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_id</span><span class="p">()</span>
+<div class="viewcode-block" id="Coherence.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.Coherence.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Volume{{</span><span class="si">{0}</span><span class="s1">}}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l1_volumes</span><span class="p">]</span>
+        <span class="n">aa</span> <span class="o">=</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Volume{{</span><span class="si">{0}</span><span class="s1">}}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l2_volumes</span><span class="p">]</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">my_string</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;//+</span>
+<span class="s1">r()=BooleanFragments{{ </span><span class="si">{0}</span><span class="s1">; Delete; }}{{ </span><span class="si">{1}</span><span class="s1">; Delete; }};</span>
+<span class="s1">// Printf(&quot;resulting geometries: &quot;, r());</span>
+<span class="s1">// Printf(&quot;size of r: &quot;,#r());</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aa</span><span class="p">,</span><span class="n">bb</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_string</span></div></div>
+
+
+<div class="viewcode-block" id="GeoFile"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.GeoFile">[docs]</a><span class="k">class</span> <span class="nc">GeoFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    SetFactory(&quot;OpenCASCADE&quot;);</span>
+<span class="s1">    Geometry.LineNumbers = 0;</span>
+<span class="s1">    Geometry.SurfaceNumbers = 0;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">characteristic_len_min</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">characteristic_len_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loops</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extrusions</span><span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_coherence</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characteristic_len_min</span> <span class="o">=</span> <span class="n">characteristic_len_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characteristic_len_max</span> <span class="o">=</span> <span class="n">characteristic_len_max</span>
+        
+<div class="viewcode-block" id="GeoFile.string"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.GeoFile.string">[docs]</a>    <span class="k">def</span> <span class="nf">string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">characteristic_len_min</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">+=</span> <span class="s1">&#39;    Mesh.CharacteristicLengthMin = </span><span class="si">{0:f}</span><span class="s1">;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">characteristic_len_min</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="ow">not</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">characteristic_len_max</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">+=</span> <span class="s1">&#39;    Mesh.CharacteristicLengthMax = </span><span class="si">{0:f}</span><span class="s1">;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">characteristic_len_max</span><span class="p">)</span>
+    
+        <span class="n">b</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">point</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">line</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">])</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">loop</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="p">])</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">surface</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="k">for</span> <span class="n">surface</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span><span class="p">])</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">extrusion</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="k">for</span> <span class="n">extrusion</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extrusions</span><span class="p">])</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">item</span><span class="o">.</span><span class="n">string</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_coherence</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="o">+</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="o">+</span><span class="n">d</span><span class="o">+</span><span class="n">e</span><span class="o">+</span><span class="n">f</span><span class="o">+</span><span class="n">g</span></div>
+    
+<div class="viewcode-block" id="GeoFile.point_tuples"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.GeoFile.point_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">point_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">comp</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GeoFile.make_mesh"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.GeoFile.make_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">make_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">delete_files</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;output.geo&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">string</span><span class="p">())</span>
+        
+        <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;gmsh output.geo -3 -format msh&#39;</span>
+<span class="c1">#        p = subprocess.Popen(string,stdout=subprocess.PIPE, stderr=subprocess.STDOUT)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="n">mesh_file</span> <span class="o">=</span> <span class="s1">&#39;output.msh&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">meshio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">mesh_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delete_files</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;output.msh&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;output.geo&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div></div>
+
+
+<div class="viewcode-block" id="laminate_to_geo"><a class="viewcode-back" href="../../foldable_robotics/foldable_robotics.html#foldable_robotics.gmsh_support.laminate_to_geo">[docs]</a><span class="k">def</span> <span class="nf">laminate_to_geo</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span><span class="n">layer_thickness</span><span class="p">,</span><span class="n">characteristic_len_min</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span><span class="n">characteristic_len_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="n">z</span><span class="o">=</span><span class="mi">0</span>
+<span class="c1">#    t = 1</span>
+    <span class="n">geofile</span> <span class="o">=</span> <span class="n">GeoFile</span><span class="p">(</span><span class="n">characteristic_len_min</span><span class="p">,</span><span class="n">characteristic_len_max</span><span class="p">)</span>
+    <span class="n">extrusions_by_layer</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">layer</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span><span class="n">layer_thickness</span><span class="p">):</span>
+        <span class="n">extrusions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">geo</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span><span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">):</span>
+                <span class="n">xy</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geo</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+                <span class="n">xyzp</span> <span class="o">=</span> <span class="p">[(</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">coord</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">z</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">xy</span><span class="p">]</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">xyzp</span><span class="p">]</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">)</span> <span class="k">for</span> <span class="n">ii</span><span class="p">,</span><span class="n">jj</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">points</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
+    <span class="c1">#            lines.append(Line(points[-1],points[0]))</span>
+                <span class="n">loop</span> <span class="o">=</span> <span class="n">Loop</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">])</span>
+                <span class="n">surface</span> <span class="o">=</span> <span class="n">Surface</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+                <span class="n">extrusion</span> <span class="o">=</span> <span class="n">Extrude</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+    
+                <span class="n">extrusions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extrusion</span><span class="p">)</span>
+    
+                <span class="n">geofile</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+                <span class="n">geofile</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                <span class="n">geofile</span><span class="o">.</span><span class="n">loops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+                <span class="n">geofile</span><span class="o">.</span><span class="n">surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+                <span class="n">geofile</span><span class="o">.</span><span class="n">extrusions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extrusion</span><span class="p">)</span>
+    
+        <span class="n">extrusions_by_layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extrusions</span><span class="p">)</span>
+        <span class="n">z</span><span class="o">+=</span><span class="n">t</span>
+   
+    <span class="k">for</span> <span class="n">ext1</span><span class="p">,</span><span class="n">ext2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">extrusions_by_layer</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">extrusions_by_layer</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">geofile</span><span class="o">.</span><span class="n">layer_coherence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Coherence</span><span class="p">(</span><span class="n">ext1</span><span class="p">,</span><span class="n">ext2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">geofile</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">tri</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)])</span>
+    <span class="n">tri</span>
+
+    <span class="n">circle</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mf">.5</span><span class="p">)</span>
+    <span class="n">circle</span>
+
+    <span class="n">square</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">.25</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="n">lam</span> <span class="o">=</span> <span class="n">Laminate</span><span class="p">(</span><span class="n">Layer</span><span class="p">(</span><span class="n">circle</span><span class="p">),</span><span class="n">Layer</span><span class="p">(</span><span class="n">tri</span><span class="p">,</span><span class="n">square</span><span class="p">))</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="n">lam</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="mf">.001</span><span class="p">)</span>
+    <span class="n">lam</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        
+    <span class="n">geofile</span> <span class="o">=</span> <span class="n">laminate_to_geo</span><span class="p">(</span><span class="n">lam</span><span class="p">,[</span><span class="mf">.1</span><span class="p">,</span><span class="mf">.1</span><span class="p">],</span><span class="mf">.05</span><span class="p">,</span><span class="mf">.05</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">geofile</span><span class="o">.</span><span class="n">make_mesh</span><span class="p">()</span>
+
+                
+    <span class="c1">#print(geofile.string())</span>
+
+
+    <span class="n">quads</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="s1">&#39;tetra&#39;</span><span class="p">]</span>
+    <span class="n">tris</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cells</span><span class="p">[</span><span class="s1">&#39;triangle&#39;</span><span class="p">]</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">points</span>
+    <span class="n">face_colors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tris</span><span class="p">])</span>
+    <span class="n">idealab_tools</span><span class="o">.</span><span class="n">plot_tris</span><span class="o">.</span><span class="n">plot_tris</span><span class="p">(</span><span class="n">points</span><span class="p">,</span><span class="n">tris</span><span class="p">,</span><span class="n">face_colors</span><span class="o">=</span><span class="n">face_colors</span><span class="p">,</span><span class="n">draw_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1">##    centroid = points[quads].sum(1)</span>
+<span class="c1">##    ii = (centroid[:,2]&lt;1).nonzero()[0]</span>
+<span class="c1">#    tet_z_values = points[quads][:,:,2]</span>
+<span class="c1">#    ii=(((tet_z_values&gt;=1)*(tet_z_values&lt;=2)).sum(1)==4).nonzero()[0]</span>
+<span class="c1">#    tri_filt = numpy.array([[0,1,2],[1,2,3],[2,3,0],[3,0,1]])</span>
+<span class="c1">#    tris2 = quads[ii,:]</span>
+<span class="c1">#    tris2 = tris2[:,tri_filt]</span>
+<span class="c1">#    tris2 = tris2.reshape((-1,3))</span>
+<span class="c1">#    face_colors2 = numpy.array([(1,0,0,.5) for item in tris2])</span>
+<span class="c1">##</span>
+<span class="c1">#    idealab_tools.plot_tris.plot_tris(points,tris2,face_colors=face_colors2,draw_edges=True, edge_color = (0,0,0,1))</span>
+<span class="c1">#    </span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">foldable_robotics</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../foldable_robotics/modules.html"> </a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Dan Aukes.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

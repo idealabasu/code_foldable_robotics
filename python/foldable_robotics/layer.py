@@ -726,6 +726,15 @@ class Layer(ClassAlgebra):
         return points2,tris2
 
     def to_laminate(self,value):
+        '''
+        convert a layer to a laminate of "value" layers
+        
+        :param self: the layer itself
+        :type self: shapely.layer.Layer
+        :rtype self: a layer
+        :param value: the number of layers in the laminate
+        :type self: integer
+        '''      	
         from foldable_robotics.laminate import Laminate
         laminate = Laminate(*([self]*value))
         return laminate

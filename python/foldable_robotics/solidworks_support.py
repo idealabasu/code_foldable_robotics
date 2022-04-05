@@ -149,13 +149,13 @@ def process(input_filename,output_file_name,prescale,round_digits,body_prebuffer
     body_layer = Layer()
     body_layer = body_layer.unary_union(*body_layers)
     
-    body_layer.plot(new=True)
+    # body_layer.plot(new=True)
     
     segments = foldable_robotics.solidworks_support.get_joints(*layers_orig,tolerance=joint_tolerance)
     
     linestrings = [sg.LineString(item) for item in segments]
     joints = Layer(*linestrings)
-    joints.plot()
+    # joints.plot()
     
     elements = []
     elements.append(({'name':'body','dxfattribs':{'color': foldable_robotics.dxf.to_index[0xff0000]}},body_layer))

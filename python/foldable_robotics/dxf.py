@@ -30,12 +30,12 @@ def read_lines(filename, color = None, layer = None):
     #        red is code 1, gets added to hinge lines
             if color is not None:
                 if e.get_dxf_attrib('color')==color:
-                    lines.append([(e.dxf.start[0],e.dxf.start[1]),(e.dxf.end[0],e.dxf.end[1])])
+                    lines.append([[e.dxf.start[0],e.dxf.start[1]],[e.dxf.end[0],e.dxf.end[1]]])
             elif layer is not None:
                 if e.get_dxf_attrib('layer')==layer:
-                    lines.append([(e.dxf.start[0],e.dxf.start[1]),(e.dxf.end[0],e.dxf.end[1])])
+                    lines.append([[e.dxf.start[0],e.dxf.start[1]],[e.dxf.end[0],e.dxf.end[1]]])
             else:
-                lines.append([(e.dxf.start[0],e.dxf.start[1]),(e.dxf.end[0],e.dxf.end[1])])
+                lines.append([[e.dxf.start[0],e.dxf.start[1]],[e.dxf.end[0],e.dxf.end[1]]])
     return lines
 
 #def read_lwpolylines(filename,color = None,layer = None):

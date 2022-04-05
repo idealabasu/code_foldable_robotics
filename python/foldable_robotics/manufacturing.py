@@ -540,7 +540,10 @@ def calc_hole(hinge_lines,width,resolution = None):
 #    holes = Layer(all_hinges4)
     
     trimmed_lines = [item-all_hinges4 for item in all_hinges1]
-    all_hinges = [tuple(sorted(item.geoms[0].coords)) for item in trimmed_lines]
+    all_hinges = []
+    for item in trimmed_lines:
+    	for geom in item.geoms:
+    	    all_hinges.append(tuple(sorted(geom.coords)))
     return all_hinges4,all_hinges
 
 if __name__=='__main__':

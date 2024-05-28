@@ -282,7 +282,7 @@ class Layer(ClassAlgebra):
         :type identical: boolean
         :rtype: Layer
         '''            
-        new = type(self)(*[sw.loads(geom.to_wkt()) for geom in self.geoms])        
+        new = type(self)(*[sw.loads(shapely.to_wkt(geom)) for geom in self.geoms])        
         if identical:        
             new.id = self.id
         return new
@@ -356,8 +356,9 @@ class Layer(ClassAlgebra):
                 ymax += expand_amount
             dx = xmax - xmin
             dy = ymax - ymin
-            width = min([max([100., dx]), 300])
-            height = min([max([100., dy]), 300])
+            max_window = foldable_robotics.display_height
+            width = min([max([max_window, dx]), 300])
+            height = min([max([max_window, dy]), 300])
             try:
                 scale_factor = max([dx, dy]) / max([width, height])
             except ZeroDivisionError:

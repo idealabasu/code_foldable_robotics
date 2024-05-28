@@ -14,7 +14,8 @@ import shapely.geometry as sg
 import shapely.ops as so
 import matplotlib.pyplot as plt
 plt.ion()
-
+import idealab_tools
+import math
 
 def cleanup(input1,value,resolution=None):
     '''
@@ -546,5 +547,39 @@ def calc_hole(hinge_lines,width,resolution = None):
     	    all_hinges.append(tuple(sorted(geom.coords)))
     return all_hinges4,all_hinges
 
+def calculate_removable_scrap(design,sheet,width,is_adhesive):
+    '''this computes all removable scrap given a sheet, a design, and a clearance width'''
+    all_scrap = sheet-design
+
+    ru = not_removable_up(design,is_adhesive)
+    rd = not_removable_down(design,is_adhesive)
+    
+    removable_scrap_up = all_scrap-(ru<<width)
+    removable_scrap_down = all_scrap-(rd<<width)
+
+    removable_scrap = removable_scrap_up|removable_scrap_down
+    return removable_scrap
+
+
+def build_layer_numbers(num_layers, text_size = None, prop=None):
+    text_size = text_size or 1
+    prop = prop or {'family':'Arial','size':text_size}
+    layers = []
+    for ii in range(num_layers): 
+    
+        l = idealab_tools.text_to_polygons.text_to_polygons('Layer '+str(ii),prop=prop)
+        layer = Layer(*[sg.Polygon(item) for item in l])
+        layers.append(layer)
+    
+    layer_id = Laminate(*layers)
+    return layer_id
+
+def hinge_width_calculator(desired_degrees,thickness):
+    '''from a given thickness and a desired angular rotation, calculate the gap between thick segments'''
+    theta = (180-desired_degrees)*math.pi/180
+    w=thickness/math.tan(theta)
+    return w
+
 if __name__=='__main__':
     pass
+

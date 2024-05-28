@@ -16,6 +16,7 @@ import shapely.wkt as sw
 import matplotlib.pyplot as plt
 import numpy
 import foldable_robotics
+import idealab_tools.text_to_polygons
 import foldable_robotics.jupyter_support as fj
 
 class NoGeoms(Exception):
@@ -798,7 +799,6 @@ class Layer(ClassAlgebra):
         '''
         makes a layer of text
         '''
-        import idealab_tools.text_to_polygons
         p = idealab_tools.text_to_polygons.text_to_polygons(text,*args,**kwargs)
         layers = [cls(sg.Polygon(item)) for item in p]
         l = Layer()

@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 plt.ion()
 import idealab_tools
 import math
+import idealab_tools.text_to_polygons
 
 def cleanup(input1,value,resolution=None):
     '''
@@ -574,11 +575,27 @@ def build_layer_numbers(num_layers, text_size = None, prop=None):
     layer_id = Laminate(*layers)
     return layer_id
 
-def hinge_width_calculator(desired_degrees,thickness):
-    '''from a given thickness and a desired angular rotation, calculate the gap between thick segments'''
-    alpha = (180-desired_degrees)*math.pi/180
-    w=thickness/math.tan(alpha/2)
+def plain_hinge_width(desired_degrees,thickness):
+    '''from a given thickness and a desired angular rotation, calculate the width between thick segments'''
+    alpha = (180-desired_degrees)/2*math.pi/180
+    w=thickness/math.tan(alpha)
     return w
+
+def castellated_hinge_width(desired_degrees,thickness):
+    '''from a given thickness and a desired angular rotation, calculate the width between thick segments and the gap between outer castellations'''
+
+    assert(desired_degrees<180)
+
+    if desired_degrees<90:
+        alpha = (90-desired_degrees)*math.pi/180
+        w=0
+        gap = thickness/math.cos(alpha)
+    else:
+        alpha = (180-desired_degrees)*math.pi/180
+        w = thickness/math.tan(alpha)
+        gap = thickness/math.tan(alpha/2)
+    
+    return w,gap
 
 if __name__=='__main__':
     pass

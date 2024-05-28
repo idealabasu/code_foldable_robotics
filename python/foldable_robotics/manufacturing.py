@@ -576,8 +576,8 @@ def build_layer_numbers(num_layers, text_size = None, prop=None):
 
 def hinge_width_calculator(desired_degrees,thickness):
     '''from a given thickness and a desired angular rotation, calculate the gap between thick segments'''
-    theta = (180-desired_degrees)*math.pi/180
-    w=thickness/math.tan(theta)
+    alpha = (180-desired_degrees)*math.pi/180
+    w=thickness/math.tan(alpha/2)
     return w
 
 if __name__=='__main__':

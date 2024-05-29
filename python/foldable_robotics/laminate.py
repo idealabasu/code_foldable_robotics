@@ -76,7 +76,7 @@ class Laminate(Iterable,ClassAlgebra):
         results = [item.is_null() for item in self]
         return all(results)
 
-    def plot(self,new=False):
+    def plot(self,new=False,axes=False):
         '''
         plots the laminate using matplotlib.
         
@@ -93,6 +93,8 @@ class Laminate(Iterable,ClassAlgebra):
                 layer.plot(color = color)
             ax = plt.gca()
             ax.axis([d[0],e[0],d[1],e[1]])
+            if not axes:
+                plt.axis('off')
         except foldable_robotics.layer.NoGeoms:
             pass
     def gen_colors(self,alpha=None):

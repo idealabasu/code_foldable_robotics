@@ -313,7 +313,7 @@ class Layer(ClassAlgebra):
         new.id = d['id']
         return new
 
-    def plot(self,*args,**kwargs):
+    def plot(self,*args,axes=False,**kwargs):
         '''
         plots the layer using matplotlib.
         
@@ -333,6 +333,9 @@ class Layer(ClassAlgebra):
             d,e=self.bounding_box_coords()
             ax = plt.gca()
             ax.axis([d[0],e[0],d[1],e[1]])
+        if not axes:
+            plt.axis('off')
+
 
     def _repr_svg_(self):
         """SVG representation for iPython notebook"""

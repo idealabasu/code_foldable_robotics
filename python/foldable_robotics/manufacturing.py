@@ -586,14 +586,14 @@ def castellated_hinge_width(desired_degrees,thickness):
 
     assert(desired_degrees<180)
 
-    if desired_degrees<90:
+    if desired_degrees<=90:
         alpha = (90-desired_degrees)*math.pi/180
         w=0
-        gap = thickness/math.cos(alpha)
+        gap = thickness*math.cos(alpha)
     else:
-        alpha = (180-desired_degrees)*math.pi/180
-        w = thickness/math.tan(alpha)
-        gap = thickness/math.tan(alpha/2)
+        alpha = (180-desired_degrees)/2*math.pi/180
+        w = thickness/math.tan(2*alpha)
+        gap = thickness/math.tan(alpha)
     
     return w,gap
 

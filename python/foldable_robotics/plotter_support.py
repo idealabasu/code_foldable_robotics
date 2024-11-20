@@ -15,24 +15,25 @@ Created on Wed Feb  7 17:24:29 2018
 import math
 ppi = 1000
 
-start_string = 'IN;PA;VS30;'
-end_string = 'PU;PU0,0;!PG;'
+# start_string = 'IN;PA;VS30;'
+# end_string = 'PU;PU0,0;!PG;'
+
+start_string = 'IN;P0;'
+end_string = 'U0,0;@'
 
 def path_string(path):
     first = True
-    # path = list(path)
     s=''
     for point in path:
         if first:
-            s+='PU{0:d},{1:d};'.format(int(point[0]),int(point[1]))
+            s+='U{0:.0f},{1:.0f};'.format(point[0],point[1])
         else:
-            s+='PD{0:d},{1:d};'.format(int(point[0]),int(point[1]))
+            s+='D{0:.0f},{1:.0f};'.format(point[0],point[1])
         first = False
-    # s+='PU;'
     return s
 
 def layer_string(layer):
-    layer = layer.rotate(-90)
+    # layer = layer.rotate(-90)
     layer = layer.scale(ppi,ppi)
     s = start_string
     for path in layer.get_paths():

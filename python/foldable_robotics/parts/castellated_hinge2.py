@@ -32,7 +32,7 @@ def generate(g=1,w=None):
 
     hinge = hinge.scale(1,g/2)
 
-    if (w is not None or w<=0):
+    if ((w is not None) or (w<=0)):
         gap_layer = Layer(sg.box(0,-w/2,5,w/2))
     else:
         gap_layer = Layer()
